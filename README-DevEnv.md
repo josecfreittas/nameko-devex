@@ -60,34 +60,52 @@ STD_APP_URL=http://localhost:8000
 {"id": "the_odyssey"}
 === Getting product id: the_odyssey ===
 {
-  "maximum_speed": 5,
-  "id": "the_odyssey",
-  "title": "The Odyssey",
   "passenger_capacity": 101,
-  "in_stock": 10
+  "title": "The Odyssey",
+  "maximum_speed": 5,
+  "in_stock": 10,
+  "id": "the_odyssey"
 }
 === Deleting product id: soon_to_be_deleted ===
 {"id": "soon_to_be_deleted"}
 204
 === Creating Order ===
-{"id": 6017}
+{"id": 6020}
 === Getting Order ===
 {
-  "id": 6017,
   "order_details": [
     {
-      "id": 6017,
-      "product": {
-        "maximum_speed": 5,
-        "id": "the_odyssey",
-        "title": "The Odyssey",
-        "passenger_capacity": 101,
-        "in_stock": 9
-      },
-      "quantity": 1,
       "image": "http://www.example.com/airship/images/the_odyssey.jpg",
+      "product": {
+        "passenger_capacity": 101,
+        "title": "The Odyssey",
+        "maximum_speed": 5,
+        "in_stock": 9,
+        "id": "the_odyssey"
+      },
       "price": "100000.99",
-      "product_id": "the_odyssey"
+      "quantity": 1,
+      "product_id": "the_odyssey",
+      "id": 6020
+    }
+  ],
+  "id": 6020
+}
+=== Listing Orders ===
+{
+  "page": 1,
+  "total_pages": 1,
+  "orders": [
+    {
+      "order_details": [
+        {
+          "quantity": 1,
+          "product_id": "the_odyssey",
+          "id": 6020,
+          "price": "100000.99"
+        }
+      ],
+      "id": 6020
     }
   ]
 }
