@@ -114,6 +114,30 @@ $ curl 'http://localhost:8003/orders/1'
 }
 ```
 
+#### List Orders
+
+```sh
+$ curl 'http://localhost:8003/orders?page=1'
+
+{
+	"page": 1,
+	"total_pages": 1,
+	"orders": [
+    {
+      "id": 1,
+      "order_details": [
+				{
+					"quantity": 1,
+					"price": "100000.99",
+					"id": 1,
+					"product_id": "the_odyssey"
+				}
+			]
+    }
+  ]
+}
+```
+
 ## Running tests
 
 Ensure RabbitMQ, PostgreSQL and Redis are running and `config.yaml` files for each service are configured correctly.
