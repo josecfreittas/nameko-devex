@@ -81,11 +81,43 @@ class GatewayService(object):
         """
         deleted = self.products_rpc.delete(product_id)
 
-        print("DELETE PRODUCT: ", deleted)
         if not deleted:
             return Response(status=404)
 
         return Response(status=204)
+
+    @http("GET", "/orders")
+    def list_orders(self, request):
+        """Lists orders.
+        Supports pagination using the `page` query parameter.
+        """
+
+        page = int(request.args.get('page', 1))
+        limit = 10
+        offset = (page - 1) * limit
+
+        orders = self.orders_rpc.list_orders(offset, limit)
+        total_orders = self.orders_rpc.count_orders()
+        total_pages = total_orders // limit + (total_orders % limit > 0)
+
+        for order in orders:
+            for item in order['order_details']:
+                product_id = item['product_id']
+                item['product'] = self.products_rpc.get(product_id)
+                item['image'] = '{}/{}.jpg'.format(
+                    config['PRODUCT_IMAGE_ROOT'], product_id
+                )
+
+        payload = {
+            'page': page,
+            'total_pages': total_pages,
+            'total_orders': total_orders,
+            'orders': orders
+        }
+
+        return Response(
+            json.dumps(payload), mimetype='application/json'
+        )
 
     @http("GET", "/orders/<int:order_id>", expected_exceptions=OrderNotFound)
     def get_order(self, request, order_id):

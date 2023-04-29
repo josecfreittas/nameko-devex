@@ -17,16 +17,66 @@ def order(db_session):
 
 @pytest.fixture
 def order_details(db_session, order):
-    db_session.add_all([
+    order_details_list = [
         OrderDetail(
             order=order, product_id="the_odyssey", price=99.51, quantity=1
         ),
         OrderDetail(
             order=order, product_id="the_enigma", price=30.99, quantity=8
         )
-    ])
+    ]
+    db_session.add_all(order_details_list)
     db_session.commit()
-    return order_details
+
+    return order_details_list
+
+
+def test_can_list_orders_with_default_options(
+        orders_rpc,
+        order,
+        order_details):
+    response = orders_rpc.list_orders()
+
+    assert len(response) == 1
+    assert order.id == response[0]['id']
+
+    assert len(response[0]['order_details']) == 2
+    assert response[0]['order_details'][0]['product_id'] \
+        == order_details[0].product_id
+    assert response[0]['order_details'][1]['product_id'] \
+        == order_details[1].product_id
+
+
+@pytest.mark.usefixtures('order')
+def test_can_list_orders_with_custom_options_without_data(orders_rpc):
+    response = orders_rpc.list_orders(10, 10)
+    assert len(response) == 0
+
+
+@pytest.mark.usefixtures('order')
+def test_can_list_orders_with_custom_options_with_data(db_session, orders_rpc):
+    orders = [Order() for i in range(10)]
+    db_session.add_all(orders)
+    db_session.commit()
+
+    response = orders_rpc.list_orders(10, 10)
+    assert len(response) == 1
+
+
+@pytest.mark.usefixtures('order')
+def test_can_count_orders(orders_rpc):
+    response = orders_rpc.count_orders()
+    assert response == 1
+
+
+@pytest.mark.usefixtures('order')
+def test_can_count_orders_with_extra_data(db_session, orders_rpc):
+    orders = [Order() for i in range(10)]
+    db_session.add_all(orders)
+    db_session.commit()
+
+    response = orders_rpc.count_orders()
+    assert response == 11
 
 
 def test_get_order(orders_rpc, order):

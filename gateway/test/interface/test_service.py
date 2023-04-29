@@ -101,6 +101,70 @@ class TestDeleteProduct(object):
             'invalid_id'
         )]
 
+
+class TestListOrders(object):
+    def test_can_list_orders(self, gateway_service, web_session):
+
+        # setup mock orders-service response:
+        gateway_service.orders_rpc.count_orders.return_value = 1
+        gateway_service.orders_rpc.list_orders.return_value = [
+            {
+                'id': 1,
+                'order_details': [
+                    {
+                        'id': 1,
+                        'quantity': 2,
+                        'product_id': 'the_odyssey',
+                        'price': '200.00'
+                    }
+                ]
+            }
+        ]
+
+        # setup mock products-service responses:
+        gateway_service.products_rpc.get.side_effect = [
+            {
+                'id': 'the_odyssey',
+                'title': 'The Odyssey',
+                'maximum_speed': 3,
+                'in_stock': 899,
+                'passenger_capacity': 100
+            }
+        ]
+
+        # call the gateway service to list orders
+        response = web_session.get('/orders')
+
+        imagem_url = 'http://example.com/airship/images/the_odyssey.jpg'
+        assert response.status_code == 200
+        assert response.json() == {
+            'page': 1,
+            'total_pages': 1,
+            'total_orders': 1,
+            'orders': [
+                {
+                    'id': 1,
+                    'order_details': [
+                        {
+                            'id': 1,
+                            'quantity': 2,
+                            'product_id': 'the_odyssey',
+                            'price': '200.00',
+                            'image': imagem_url,
+                            'product': {
+                                'id': 'the_odyssey',
+                                'title': 'The Odyssey',
+                                'maximum_speed': 3,
+                                'in_stock': 899,
+                                'passenger_capacity': 100
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+
+
 class TestGetOrder(object):
 
     def test_can_get_order(self, gateway_service, web_session):
