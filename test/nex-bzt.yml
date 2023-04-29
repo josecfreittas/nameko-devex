@@ -109,8 +109,40 @@ scenarios:
       then:
         - action: continue
 
-    # 5. Delete Product
-    - url: /products/${product_id}
+    # 5. List Orders
+    - url: /orders
+      label: orders-list
+      think-time: uniform(0s, 0s)
+      method: GET
+        
+      assert:
+      - contains:
+        - 200
+        subject: http-code
+        not: false
+
+    # 6. Create a Product to Delete
+    - url: /products
+      label: products-create-to-delete
+      think-time: uniform(0s, 0s)
+      method: POST
+      headers:
+        cache-control: no-cache
+        Content-Type: application/json
+      body: >
+        {
+          "id": "product-to-delete-${__javaScript(Math.random())}",
+          "title": "Product to Delete",
+          "passenger_capacity": 50,
+          "maximum_speed": 3,
+          "in_stock": 5
+        }
+      extract-jsonpath:
+        product_to_delete: $.id
+        default: NOT_FOUND
+
+    # 7. Delete Product
+    - url: /products/${product_to_delete}
       label: product-delete
       think-time: uniform(0s, 0s)
       method: DELETE
@@ -120,7 +152,7 @@ scenarios:
         - 204
         subject: http-code
         not: false
-  
+
 reporting:
 - module: final-stats
   dump-xml: stats.xml
