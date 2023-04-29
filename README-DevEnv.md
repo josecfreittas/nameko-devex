@@ -54,39 +54,42 @@ $ conda deactivate nameko-devex
 (nameko-devex) ./test/nex-smoketest.sh local 
 
 # Example output:
-Local Development
+Local Smoke Test
 STD_APP_URL=http://localhost:8000
 === Creating a product id: the_odyssey ===
 {"id": "the_odyssey"}
 === Getting product id: the_odyssey ===
 {
-  "in_stock": 10,
-  "id": "the_odyssey",
   "maximum_speed": 5,
+  "id": "the_odyssey",
+  "title": "The Odyssey",
   "passenger_capacity": 101,
-  "title": "The Odyssey"
+  "in_stock": 10
 }
+=== Deleting product id: soon_to_be_deleted ===
+{"id": "soon_to_be_deleted"}
+204
 === Creating Order ===
-{"id": 3}
+{"id": 6017}
 === Getting Order ===
 {
+  "id": 6017,
   "order_details": [
     {
+      "id": 6017,
+      "product": {
+        "maximum_speed": 5,
+        "id": "the_odyssey",
+        "title": "The Odyssey",
+        "passenger_capacity": 101,
+        "in_stock": 9
+      },
+      "quantity": 1,
       "image": "http://www.example.com/airship/images/the_odyssey.jpg",
       "price": "100000.99",
-      "product_id": "the_odyssey",
-      "id": 3,
-      "product": {
-        "in_stock": 9,
-        "id": "the_odyssey",
-        "maximum_speed": 5,
-        "passenger_capacity": 101,
-        "title": "The Odyssey"
-      },
-      "quantity": 1
+      "product_id": "the_odyssey"
     }
-  ],
-  "id": 3
+  ]
 }
 ```
 

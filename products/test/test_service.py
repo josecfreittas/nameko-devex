@@ -31,6 +31,27 @@ def test_get_product_fails_on_not_found(service_container):
         with entrypoint_hook(service_container, 'get') as get:
             get(111)
 
+def test_delete_product(create_product, service_container):
+
+    stored_product = create_product()
+
+    with entrypoint_hook(service_container, 'delete') as delete:
+        deleted = delete(stored_product['id'])
+
+    assert deleted
+
+    with pytest.raises(NotFound):
+        with entrypoint_hook(service_container, 'get') as get:
+            get(stored_product['id'])
+
+def test_delete_product_fails_on_not_found(service_container):
+
+    with entrypoint_hook(service_container, 'delete') as delete:
+        deleted = delete('invalid_id')
+
+    assert not deleted
+
+
 
 def test_list_products(products, service_container):
 
