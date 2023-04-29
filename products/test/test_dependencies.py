@@ -28,10 +28,22 @@ def test_get(storage, products):
     assert 11 == product['in_stock']
 
 
-def test_list(storage, products):
+def test_list_without_filter(storage, products):
     listed_products = storage.list()
-    assert (
-        products == sorted(list(listed_products), key=lambda x: x['id']))
+
+    assert products \
+        == sorted(list(listed_products), key=lambda x: x['id'])
+
+
+def test_list_with_filter(storage, create_product):
+    create_product(id='item_1', title='ITEM 1', in_stock=10)
+    product_2 = create_product(id='item_2', title='ITEM 2', in_stock=11)
+    product_3 = create_product(id='item_3', title='ITEM 3', in_stock=12)
+
+    listed_products = storage.list(['item_2', 'item_3'])
+
+    assert [product_2, product_3] \
+        == sorted(list(listed_products), key=lambda x: x['id'])
 
 
 def test_create(product, redis_client, storage):
