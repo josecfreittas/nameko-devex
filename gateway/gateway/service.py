@@ -96,6 +96,14 @@ class GatewayService(object):
         page = int(request.args.get('page', 1))
         orders = self.orders_rpc.list_orders(page)
 
+        for order in orders['orders']:
+            for item in order['order_details']:
+                product_id = item['product_id']
+                item['product'] = self.products_rpc.get(product_id)
+                item['image'] = '{}/{}.jpg'.format(
+                    config['PRODUCT_IMAGE_ROOT'], product_id
+                )
+
         return Response(
             json.dumps(orders), mimetype='application/json'
         )

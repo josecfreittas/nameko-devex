@@ -130,7 +130,15 @@ $ curl 'http://localhost:8003/orders?page=1'
 					"quantity": 1,
 					"price": "100000.99",
 					"id": 1,
-					"product_id": "the_odyssey"
+          "image": "http://www.example.com/airship/images/the_odyssey.jpg",
+					"product_id": "the_odyssey",
+          "product": {
+            "maximum_speed": 5,
+            "id": "the_odyssey",
+            "title": "The Odyssey",
+            "passenger_capacity": 101,
+            "in_stock": 9
+          }
 				}
 			]
     }
