@@ -101,6 +101,53 @@ class TestDeleteProduct(object):
             'invalid_id'
         )]
 
+
+class TestListOrders(object):
+    def test_can_list_orders(self, gateway_service, web_session):
+        expected_response = {
+            'page': 1,
+            'total_pages': 1,
+            'orders': [
+                {
+                    'id': 1,
+                    'order_details': [
+                        {
+                            'id': 1,
+                            'quantity': 2,
+                            'product_id': 'the_odyssey',
+                            'price': '200.00'
+                        },
+                        {
+                            'id': 2,
+                            'quantity': 1,
+                            'product_id': 'the_enigma',
+                            'price': '400.00'
+                        }
+                    ]
+                },
+                {
+                    'id': 2,
+                    'order_details': [
+                        {
+                            'id': 3,
+                            'quantity': 1,
+                            'product_id': 'the_odyssey',
+                            'price': '200.00'
+                        }
+                    ]
+                }
+            ]
+        }
+
+        # setup mock orders-service response:
+        gateway_service.orders_rpc.list_orders.return_value = expected_response
+
+        # call the gateway service to list orders
+        response = web_session.get('/orders')
+        assert response.status_code == 200
+        assert response.json() == expected_response
+
+
 class TestGetOrder(object):
 
     def test_can_get_order(self, gateway_service, web_session):

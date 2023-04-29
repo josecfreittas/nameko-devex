@@ -87,6 +87,19 @@ class GatewayService(object):
 
         return Response(status=204)
 
+    @http("GET", "/orders")
+    def list_orders(self, request):
+        """Lists orders.
+        Supports pagination using the `page` query parameter.
+        """
+
+        page = int(request.args.get('page', 1))
+        orders = self.orders_rpc.list_orders(page)
+
+        return Response(
+            json.dumps(orders), mimetype='application/json'
+        )
+
     @http("GET", "/orders/<int:order_id>", expected_exceptions=OrderNotFound)
     def get_order(self, request, order_id):
         """Gets the order details for the order given by `order_id`.
