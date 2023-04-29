@@ -73,6 +73,13 @@ $ curl 'http://localhost:8003/products/the_odyssey'
   "in_stock": 10
 }
 ```
+
+### Delete Product
+
+```sh
+$ curl -XDELETE 'http://localhost:8003/products/the_odyssey'
+```
+
 #### Create Order
 
 ```sh
