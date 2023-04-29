@@ -94,9 +94,14 @@ class GatewayService(object):
         """
 
         page = int(request.args.get('page', 1))
-        orders = self.orders_rpc.list_orders(page)
+        limit = 10
+        offset = (page - 1) * limit
 
-        for order in orders['orders']:
+        orders = self.orders_rpc.list_orders(offset, limit)
+        total_orders = self.orders_rpc.count_orders()
+        total_pages = total_orders // limit + (total_orders % limit > 0)
+
+        for order in orders:
             for item in order['order_details']:
                 product_id = item['product_id']
                 item['product'] = self.products_rpc.get(product_id)
@@ -104,8 +109,15 @@ class GatewayService(object):
                     config['PRODUCT_IMAGE_ROOT'], product_id
                 )
 
+        payload = {
+            'page': page,
+            'total_pages': total_pages,
+            'total_orders': total_orders,
+            'orders': orders
+        }
+
         return Response(
-            json.dumps(orders), mimetype='application/json'
+            json.dumps(payload), mimetype='application/json'
         )
 
     @http("GET", "/orders/<int:order_id>", expected_exceptions=OrderNotFound)

@@ -95,6 +95,7 @@ STD_APP_URL=http://localhost:8000
 {
   "page": 1,
   "total_pages": 1,
+  "total_orders": 1,
   "orders": [
     {
       "order_details": [

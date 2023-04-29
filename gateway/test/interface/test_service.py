@@ -106,23 +106,20 @@ class TestListOrders(object):
     def test_can_list_orders(self, gateway_service, web_session):
         
         # setup mock orders-service response:
-        gateway_service.orders_rpc.list_orders.return_value = {
-            'page': 1,
-            'total_pages': 1,
-            'orders': [
-                {
-                    'id': 1,
-                    'order_details': [
-                        {
-                            'id': 1,
-                            'quantity': 2,
-                            'product_id': 'the_odyssey',
-                            'price': '200.00'
-                        }
-                    ]
-                }
-            ]
-        }
+        gateway_service.orders_rpc.count_orders.return_value = 1
+        gateway_service.orders_rpc.list_orders.return_value = [
+            {
+                'id': 1,
+                'order_details': [
+                    {
+                        'id': 1,
+                        'quantity': 2,
+                        'product_id': 'the_odyssey',
+                        'price': '200.00'
+                    }
+                ]
+            }
+        ]
 
         # setup mock products-service responses:
         gateway_service.products_rpc.get.side_effect = [
@@ -142,6 +139,7 @@ class TestListOrders(object):
         assert response.json() == {
             'page': 1,
             'total_pages': 1,
+            'total_orders': 1,
             'orders': [
                 {
                     'id': 1,

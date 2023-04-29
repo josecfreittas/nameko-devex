@@ -14,22 +14,13 @@ class OrdersService:
     event_dispatcher = EventDispatcher()
 
     @rpc
-    def list_orders(self, page=1):
-        per_page = 10
-
-        offset = (page - 1) * per_page
-        orders = self.db.query(Order).limit(per_page).offset(offset).all()
-
-        total_orders = self.db.query(Order).count()
-        total_pages = total_orders // per_page + (total_orders % per_page > 0)
-
-        print(orders)
-
-        return {
-            'page': page,
-            'total_pages': total_pages,
-            'orders': OrderSchema().dump(orders, many=True).data
-        }
+    def list_orders(self, offset=0, limit=10):
+        orders = self.db.query(Order).limit(limit).offset(offset).all()
+        return OrderSchema().dump(orders, many=True).data
+    
+    @rpc
+    def count_orders(self):
+        return self.db.query(Order).count()
 
     @rpc
     def get_order(self, order_id):

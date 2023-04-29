@@ -122,6 +122,7 @@ $ curl 'http://localhost:8003/orders?page=1'
 {
 	"page": 1,
 	"total_pages": 1,
+  "total_orders": 1,
 	"orders": [
     {
       "id": 1,
