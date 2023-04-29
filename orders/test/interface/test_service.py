@@ -17,16 +17,57 @@ def order(db_session):
 
 @pytest.fixture
 def order_details(db_session, order):
-    db_session.add_all([
+    order_details_list = [
         OrderDetail(
             order=order, product_id="the_odyssey", price=99.51, quantity=1
         ),
         OrderDetail(
             order=order, product_id="the_enigma", price=30.99, quantity=8
         )
-    ])
+    ]
+    db_session.add_all(order_details_list)
     db_session.commit()
-    return order_details
+
+    return order_details_list
+
+
+def test_can_list_orders_with_default_page(orders_rpc, order, order_details):
+    response = orders_rpc.list_orders()
+    assert response['page'] == 1
+    assert response['total_pages'] == 1
+
+    assert len(response['orders']) == 1
+
+    response_order = response['orders'][0]
+    assert order.id == response_order['id']
+
+    assert len(response_order['order_details']) == 2
+    assert response_order['order_details'][0]['product_id'] \
+        == order_details[0].product_id
+    assert response_order['order_details'][1]['product_id'] \
+        == order_details[1].product_id
+
+
+@pytest.mark.usefixtures('order')
+def test_can_list_orders_with_custom_page_without_data(orders_rpc):
+    response = orders_rpc.list_orders(2)
+    assert response['page'] == 2
+    assert response['total_pages'] == 1
+
+    assert len(response['orders']) == 0
+
+
+@pytest.mark.usefixtures('order')
+def test_can_list_orders_with_custom_page_with_data(db_session, orders_rpc):
+
+    orders = [Order() for i in range(10)]
+    db_session.add_all(orders)
+    db_session.commit()
+
+    response = orders_rpc.list_orders(2)
+    assert response['page'] == 2
+    assert response['total_pages'] == 2
+    assert len(response['orders']) == 1
 
 
 def test_get_order(orders_rpc, order):
