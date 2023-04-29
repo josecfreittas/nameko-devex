@@ -81,6 +81,26 @@ class TestCreateProduct(object):
         assert response.json()['error'] == 'VALIDATION_ERROR'
 
 
+class TestDeleteProduct(object):
+    def test_can_delete_product(self, gateway_service, web_session):
+        response = web_session.delete('/products/the_odyssey')
+        assert response.status_code == 204
+        assert gateway_service.products_rpc.delete.call_args_list == [call(
+            'the_odyssey'
+        )]
+
+    def test_delete_product_fails_with_invalid_data(
+        self, gateway_service, web_session
+    ):
+        # Configure the MagicMock to return 0 for a failed deletion
+        gateway_service.products_rpc.delete.return_value = False
+
+        response = web_session.delete('/products/invalid_id')
+        assert response.status_code == 404
+        assert gateway_service.products_rpc.delete.call_args_list == [call(
+            'invalid_id'
+        )]
+
 class TestGetOrder(object):
 
     def test_can_get_order(self, gateway_service, web_session):
