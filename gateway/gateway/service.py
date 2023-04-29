@@ -100,10 +100,18 @@ class GatewayService(object):
         total_orders = self.orders_rpc.count_orders()
         total_pages = total_orders // limit + (total_orders % limit > 0)
 
+        product_ids = [
+            item['product_id']
+            for order in orders for item in order['order_details']]
+        products = self.products_rpc.list(product_ids)
+
         for order in orders:
             for item in order['order_details']:
                 product_id = item['product_id']
-                item['product'] = self.products_rpc.get(product_id)
+                item['product'] = next(
+                    (product for product in products
+                     if product['id'] == product_id),
+                    None)
                 item['image'] = '{}/{}.jpg'.format(
                     config['PRODUCT_IMAGE_ROOT'], product_id
                 )
@@ -138,18 +146,13 @@ class GatewayService(object):
         # raise``OrderNotFound``
         order = self.orders_rpc.get_order(order_id)
 
-        # Retrieve all products from the products service
-        product_map = {prod['id']: prod for prod in self.products_rpc.list()}
-
         # get the configured image root
         image_root = config['PRODUCT_IMAGE_ROOT']
 
         # Enhance order details with product and image details.
         for item in order['order_details']:
             product_id = item['product_id']
-
-            item['product'] = product_map[product_id]
-            # Construct an image url.
+            item['product'] = self.products_rpc.get(product_id)
             item['image'] = '{}/{}.jpg'.format(image_root, product_id)
 
         return order
@@ -201,10 +204,15 @@ class GatewayService(object):
         return Response(json.dumps({'id': id_}), mimetype='application/json')
 
     def _create_order(self, order_data):
-        # check order product ids are valid
-        valid_product_ids = {prod['id'] for prod in self.products_rpc.list()}
+
+        product_ids = [item['product_id']
+                       for item in order_data['order_details']]
+        valid_products_ids = [prod['id']
+                              for prod in self.products_rpc.list(product_ids)]
+
+        # if the product does not exist, a remote exception will be raised
         for item in order_data['order_details']:
-            if item['product_id'] not in valid_product_ids:
+            if item['product_id'] not in valid_products_ids:
                 raise ProductNotFound(
                     "Product Id {}".format(item['product_id'])
                 )
