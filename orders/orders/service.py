@@ -17,7 +17,7 @@ class OrdersService:
     def list_orders(self, offset=0, limit=10):
         orders = self.db.query(Order).limit(limit).offset(offset).all()
         return OrderSchema().dump(orders, many=True).data
-    
+
     @rpc
     def count_orders(self):
         return self.db.query(Order).count()

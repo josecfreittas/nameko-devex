@@ -31,7 +31,10 @@ def order_details(db_session, order):
     return order_details_list
 
 
-def test_can_list_orders_with_default_options(orders_rpc, order, order_details):
+def test_can_list_orders_with_default_options(
+        orders_rpc,
+        order,
+        order_details):
     response = orders_rpc.list_orders()
 
     assert len(response) == 1
@@ -59,10 +62,12 @@ def test_can_list_orders_with_custom_options_with_data(db_session, orders_rpc):
     response = orders_rpc.list_orders(10, 10)
     assert len(response) == 1
 
+
 @pytest.mark.usefixtures('order')
 def test_can_count_orders(orders_rpc):
     response = orders_rpc.count_orders()
     assert response == 1
+
 
 @pytest.mark.usefixtures('order')
 def test_can_count_orders_with_extra_data(db_session, orders_rpc):

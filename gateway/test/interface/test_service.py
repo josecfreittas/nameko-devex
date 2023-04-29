@@ -104,7 +104,7 @@ class TestDeleteProduct(object):
 
 class TestListOrders(object):
     def test_can_list_orders(self, gateway_service, web_session):
-        
+
         # setup mock orders-service response:
         gateway_service.orders_rpc.count_orders.return_value = 1
         gateway_service.orders_rpc.list_orders.return_value = [
@@ -134,7 +134,8 @@ class TestListOrders(object):
 
         # call the gateway service to list orders
         response = web_session.get('/orders')
-        print(response.json())
+
+        imagem_url = 'http://example.com/airship/images/the_odyssey.jpg'
         assert response.status_code == 200
         assert response.json() == {
             'page': 1,
@@ -149,7 +150,7 @@ class TestListOrders(object):
                             'quantity': 2,
                             'product_id': 'the_odyssey',
                             'price': '200.00',
-                            'image': 'http://example.com/airship/images/the_odyssey.jpg',
+                            'image': imagem_url,
                             'product': {
                                 'id': 'the_odyssey',
                                 'title': 'The Odyssey',

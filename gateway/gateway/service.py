@@ -81,7 +81,6 @@ class GatewayService(object):
         """
         deleted = self.products_rpc.delete(product_id)
 
-        print("DELETE PRODUCT: ", deleted)
         if not deleted:
             return Response(status=404)
 
